@@ -188,6 +188,7 @@ resource "netbox_virtual_machine" "test" {
   cluster_id = netbox_cluster.test.id
   site_id = netbox_site.test.id
   comments = "thisisacomment"
+  description = "thisisadescription"
   memory_mb = 1024
   disk_size_gb = 256
   tenant_id = netbox_tenant.test.id
@@ -206,6 +207,7 @@ resource "netbox_virtual_machine" "test" {
 					resource.TestCheckResourceAttrPair("netbox_virtual_machine.test", "role_id", "netbox_device_role.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_virtual_machine.test", "device_id", "netbox_device.test", "id"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "comments", "thisisacomment"),
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "description", "thisisadescription"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "memory_mb", "1024"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "vcpus", "4"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "disk_size_gb", "256"),
@@ -220,6 +222,7 @@ resource "netbox_virtual_machine" "test" {
   name = "%[1]s"
   site_id = netbox_site.test.id
   comments = "thisisacomment"
+  description = "thisisadescription"
   memory_mb = 1024
   disk_size_gb = 256
   tenant_id = netbox_tenant.test.id
@@ -236,6 +239,7 @@ resource "netbox_virtual_machine" "test" {
 					resource.TestCheckResourceAttrPair("netbox_virtual_machine.test", "platform_id", "netbox_platform.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_virtual_machine.test", "role_id", "netbox_device_role.test", "id"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "comments", "thisisacomment"),
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "description", "thisisadescription"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "memory_mb", "1024"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "vcpus", "4"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "disk_size_gb", "256"),
@@ -260,6 +264,7 @@ resource "netbox_virtual_machine" "test" {
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "memory_mb", "0"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "disk_size_gb", "0"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "comments", ""),
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "description", ""),
 				),
 			},
 			{
@@ -439,9 +444,93 @@ resource "netbox_virtual_machine" "test" {
   cluster_id         = netbox_cluster.test.id
   site_id            = netbox_site.test.id
   local_context_data = jsonencode({"context_string"="context_value"})
+}`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s_foo"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value"})
+}`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value"})
   }`, testName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value_2"})
+  }`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value_2\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({})
+  }`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value_2"})
+  }`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value_2\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value_2","test_string"="broken"})
+  }`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value_2\",\"test_string\":\"broken\"}"),
+				),
+			},
+			{
+				Config: testAccNetboxVirtualMachineFullDependencies(testName) + fmt.Sprintf(`
+resource "netbox_virtual_machine" "test" {
+  name               = "%[1]s"
+  cluster_id         = netbox_cluster.test.id
+  site_id            = netbox_site.test.id
+  local_context_data = jsonencode({"context_string"="context_value_2"})
+  }`, testName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value_2\"}"),
 				),
 			},
 		},

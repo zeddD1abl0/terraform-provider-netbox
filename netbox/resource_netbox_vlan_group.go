@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
+var resourceNetboxVlanGroupScopeTypeOptions = []string{"dcim.location", "dcim.site", "dcim.sitegroup", "dcim.region", "dcim.rack", "virtualization.cluster", "virtualization.clustergroup"}
+
 func resourceNetboxVlanGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceNetboxVlanGroupCreate,
@@ -43,7 +45,8 @@ func resourceNetboxVlanGroup() *schema.Resource {
 			"scope_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"dcim.location", "dcim.site", "dcim.sitegroup", "dcim.region", "dcim.rack", "virtualization.cluster", "virtualization.clustergroup"}, false),
+				ValidateFunc: validation.StringInSlice(resourceNetboxVlanGroupScopeTypeOptions, false),
+				Description:  buildValidValueDescription(resourceNetboxPrefixStatusOptions),
 			},
 			"scope_id": {
 				Type:         schema.TypeInt,
@@ -69,14 +72,14 @@ func resourceNetboxVlanGroupCreate(d *schema.ResourceData, m interface{}) error 
 
 	name := d.Get("name").(string)
 	slug := d.Get("slug").(string)
-	min_vid := int64(d.Get("min_vid").(int))
-	max_vid := int64(d.Get("max_vid").(int))
+	minVid := int64(d.Get("min_vid").(int))
+	maxVid := int64(d.Get("max_vid").(int))
 	description := d.Get("description").(string)
 
 	data.Name = &name
 	data.Slug = &slug
-	data.MinVid = min_vid
-	data.MaxVid = max_vid
+	data.MinVid = minVid
+	data.MaxVid = maxVid
 	data.Description = description
 
 	if scopeType, ok := d.GetOk("scope_type"); ok {
@@ -144,14 +147,14 @@ func resourceNetboxVlanGroupUpdate(d *schema.ResourceData, m interface{}) error 
 
 	name := d.Get("name").(string)
 	slug := d.Get("slug").(string)
-	min_vid := int64(d.Get("min_vid").(int))
-	max_vid := int64(d.Get("max_vid").(int))
+	minVid := int64(d.Get("min_vid").(int))
+	maxVid := int64(d.Get("max_vid").(int))
 	description := d.Get("description").(string)
 
 	data.Name = &name
 	data.Slug = &slug
-	data.MinVid = min_vid
-	data.MaxVid = max_vid
+	data.MinVid = minVid
+	data.MaxVid = maxVid
 	data.Description = description
 
 	if scopeType, ok := d.GetOk("scope_type"); ok {

@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
+var resourceNetboxServiceProtocolOptions = []string{"tcp", "udp", "sctp"}
+
 func resourceNetboxService() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceNetboxServiceCreate,
@@ -36,7 +38,8 @@ func resourceNetboxService() *schema.Resource {
 			"protocol": {
 				Type:             schema.TypeString,
 				Required:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"tcp", "udp", "sctp"}, false)),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(resourceNetboxServiceProtocolOptions, false)),
+				Description:      buildValidValueDescription(resourceNetboxServiceProtocolOptions),
 			},
 			"port": {
 				Type:         schema.TypeInt,
@@ -52,6 +55,7 @@ func resourceNetboxService() *schema.Resource {
 					Type: schema.TypeInt,
 				},
 			},
+			customFieldsKey: customFieldsSchema,
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
@@ -91,6 +95,11 @@ func resourceNetboxServiceCreate(d *schema.ResourceData, m interface{}) error {
 	data.Tags = []*models.NestedTag{}
 	data.Ipaddresses = []int64{}
 
+	ct, ok := d.GetOk(customFieldsKey)
+	if ok {
+		data.CustomFields = ct
+	}
+
 	params := ipam.NewIpamServicesCreateParams().WithData(&data)
 	res, err := api.Ipam.IpamServicesCreate(params, nil)
 	if err != nil {
@@ -123,6 +132,11 @@ func resourceNetboxServiceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("protocol", res.GetPayload().Protocol.Value)
 	d.Set("ports", res.GetPayload().Ports)
 	d.Set("virtual_machine_id", res.GetPayload().VirtualMachine.ID)
+
+	cf := getCustomFields(res.GetPayload().CustomFields)
+	if cf != nil {
+		d.Set(customFieldsKey, cf)
+	}
 
 	return nil
 }
@@ -157,6 +171,11 @@ func resourceNetboxServiceUpdate(d *schema.ResourceData, m interface{}) error {
 
 	dataVirtualMachineID := int64(d.Get("virtual_machine_id").(int))
 	data.VirtualMachine = &dataVirtualMachineID
+
+	cf, ok := d.GetOk(customFieldsKey)
+	if ok {
+		data.CustomFields = cf
+	}
 
 	params := ipam.NewIpamServicesUpdateParams().WithID(id).WithData(&data)
 	_, err := api.Ipam.IpamServicesUpdate(params, nil)

@@ -111,6 +111,7 @@ func resourceNetboxPrimaryIPUpdate(d *schema.ResourceData, m interface{}) error 
 		tag.Display = ""
 	}
 	data.Comments = vm.Comments
+	data.Description = vm.Description
 	data.Memory = vm.Memory
 	data.Vcpus = vm.Vcpus
 	data.Disk = vm.Disk
@@ -145,6 +146,10 @@ func resourceNetboxPrimaryIPUpdate(d *schema.ResourceData, m interface{}) error 
 
 	if vm.Device != nil {
 		data.Device = &vm.Device.ID
+	}
+
+	if vm.LocalContextData != nil {
+		data.LocalContextData = vm.LocalContextData
 	}
 
 	// unset primary ip address if -1 is passed as id

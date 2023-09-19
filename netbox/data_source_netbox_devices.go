@@ -66,6 +66,10 @@ func dataSourceNetboxDevices() *schema.Resource {
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
+						"description": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"device_id": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -126,6 +130,7 @@ func dataSourceNetboxDevices() *schema.Resource {
 							Type:     schema.TypeFloat,
 							Computed: true,
 						},
+						"tags": tagsSchemaRead,
 					},
 				},
 			},
@@ -157,14 +162,20 @@ func dataSourceNetboxDevicesRead(d *schema.ResourceData, m interface{}) error {
 				var regionString = v.(string)
 				params.Region = &regionString
 			case "role_id":
-				var roleIdString = v.(string)
-				params.RoleID = &roleIdString
+				var roleIDString = v.(string)
+				params.RoleID = &roleIDString
 			case "site_id":
-				var siteIdString = v.(string)
-				params.SiteID = &siteIdString
+				var siteIDString = v.(string)
+				params.SiteID = &siteIDString
+			case "location_id":
+				var locationIDString = v.(string)
+				params.LocationID = &locationIDString
+			case "rack_id":
+				var rackIDString = v.(string)
+				params.RackID = &rackIDString
 			case "tenant_id":
-				var tenantIdString = v.(string)
-				params.TenantID = &tenantIdString
+				var tenantIDString = v.(string)
+				params.TenantID = &tenantIDString
 			default:
 				return fmt.Errorf("'%s' is not a supported filter parameter", k)
 			}
@@ -205,6 +216,9 @@ func dataSourceNetboxDevicesRead(d *schema.ResourceData, m interface{}) error {
 		if device.Comments != "" {
 			mapping["comments"] = device.Comments
 		}
+		if device.Description != "" {
+			mapping["description"] = device.Description
+		}
 		mapping["device_id"] = device.ID
 		if device.DeviceType != nil {
 			mapping["device_type_id"] = device.DeviceType.ID
@@ -230,8 +244,8 @@ func dataSourceNetboxDevicesRead(d *schema.ResourceData, m interface{}) error {
 		if device.Tenant != nil {
 			mapping["tenant_id"] = device.Tenant.ID
 		}
-		if device.DeviceRole != nil {
-			mapping["role_id"] = device.DeviceRole.ID
+		if device.Role != nil {
+			mapping["role_id"] = device.Role.ID
 		}
 		if device.Serial != "" {
 			mapping["serial"] = device.Serial
@@ -250,6 +264,9 @@ func dataSourceNetboxDevicesRead(d *schema.ResourceData, m interface{}) error {
 		}
 		if device.Face != nil {
 			mapping["rack_face"] = device.Face.Value
+		}
+		if device.Tags != nil {
+			mapping["tags"] = getTagListFromNestedTagList(device.Tags)
 		}
 		s = append(s, mapping)
 	}

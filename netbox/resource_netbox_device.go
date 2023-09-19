@@ -12,6 +12,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
+var resourceNetboxDeviceStatusOptions = []string{"offline", "active", "planned", "staged", "failed", "inventory"}
+var resourceNetboxDeviceRackFaceOptions = []string{"front", "rear"}
+
 func resourceNetboxDevice() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceNetboxDeviceCreate,
@@ -64,6 +67,14 @@ func resourceNetboxDevice() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"asset_tag": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			tagsKey: tagsSchema,
 			"primary_ipv4": {
 				Type:     schema.TypeInt,
@@ -76,7 +87,8 @@ func resourceNetboxDevice() *schema.Resource {
 			"status": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"offline", "active", "planned", "staged", "failed", "inventory"}, false),
+				ValidateFunc: validation.StringInSlice(resourceNetboxDeviceStatusOptions, false),
+				Description:  buildValidValueDescription(resourceNetboxDeviceStatusOptions),
 				Default:      "active",
 			},
 			"rack_id": {
@@ -87,7 +99,8 @@ func resourceNetboxDevice() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				RequiredWith: []string{"rack_position"},
-				ValidateFunc: validation.StringInSlice([]string{"front", "rear"}, false),
+				ValidateFunc: validation.StringInSlice(resourceNetboxDeviceRackFaceOptions, false),
+				Description:  buildValidValueDescription(resourceNetboxDeviceRackFaceOptions),
 			},
 			"rack_position": {
 				Type:     schema.TypeFloat,
@@ -116,14 +129,18 @@ func resourceNetboxDeviceCreate(ctx context.Context, d *schema.ResourceData, m i
 		data.DeviceType = &typeID
 	}
 
-	comments := d.Get("comments").(string)
-	data.Comments = comments
+	if assetTagValue, ok := d.GetOk("asset_tag"); ok {
+		assetTag := string(assetTagValue.(string))
+		data.AssetTag = &assetTag
+	}
 
-	serial := d.Get("serial").(string)
-	data.Serial = serial
+	data.Comments = d.Get("comments").(string)
 
-	status := d.Get("status").(string)
-	data.Status = status
+	data.Description = d.Get("description").(string)
+
+	data.Serial = d.Get("serial").(string)
+
+	data.Status = d.Get("status").(string)
 
 	tenantIDValue, ok := d.GetOk("tenant_id")
 	if ok {
@@ -152,7 +169,7 @@ func resourceNetboxDeviceCreate(ctx context.Context, d *schema.ResourceData, m i
 	roleIDValue, ok := d.GetOk("role_id")
 	if ok {
 		roleID := int64(roleIDValue.(int))
-		data.DeviceRole = &roleID
+		data.Role = &roleID
 	}
 
 	siteIDValue, ok := d.GetOk("site_id")
@@ -256,8 +273,8 @@ func resourceNetboxDeviceRead(ctx context.Context, d *schema.ResourceData, m int
 		d.Set("cluster_id", nil)
 	}
 
-	if device.DeviceRole != nil {
-		d.Set("role_id", device.DeviceRole.ID)
+	if device.Role != nil {
+		d.Set("role_id", device.Role.ID)
 	} else {
 		d.Set("role_id", nil)
 	}
@@ -273,7 +290,11 @@ func resourceNetboxDeviceRead(ctx context.Context, d *schema.ResourceData, m int
 		d.Set(customFieldsKey, cf)
 	}
 
+	d.Set("asset_tag", device.AssetTag)
+
 	d.Set("comments", device.Comments)
+
+	d.Set("description", device.Description)
 
 	d.Set("serial", device.Serial)
 
@@ -342,22 +363,13 @@ func resourceNetboxDeviceUpdate(ctx context.Context, d *schema.ResourceData, m i
 	roleIDValue, ok := d.GetOk("role_id")
 	if ok {
 		roleID := int64(roleIDValue.(int))
-		data.DeviceRole = &roleID
+		data.Role = &roleID
 	}
 
 	siteIDValue, ok := d.GetOk("site_id")
 	if ok {
 		siteID := int64(siteIDValue.(int))
 		data.Site = &siteID
-	}
-
-	commentsValue, ok := d.GetOk("comments")
-	if ok {
-		comments := commentsValue.(string)
-		data.Comments = comments
-	} else {
-		comments := " "
-		data.Comments = comments
 	}
 
 	primaryIP4Value, ok := d.GetOk("primary_ipv4")
@@ -383,17 +395,31 @@ func resourceNetboxDeviceUpdate(ctx context.Context, d *schema.ResourceData, m i
 
 	data.Tags, _ = getNestedTagListFromResourceDataSet(api, d.Get(tagsKey))
 
+	if d.HasChanges("asset_tag") {
+		if assetTagValue, ok := d.GetOk("asset_tag"); ok {
+			assetTag := assetTagValue.(string)
+			data.AssetTag = &assetTag
+		} else {
+			assetTag := " "
+			data.AssetTag = &assetTag
+		}
+	}
+
 	if d.HasChanges("comments") {
 		// check if comment is set
-		commentsValue, ok := d.GetOk("comments")
-		comments := ""
-		if !ok {
-			// Setting an space string deletes the comment
-			comments = " "
+		if commentsValue, ok := d.GetOk("comments"); ok {
+			data.Comments = commentsValue.(string)
 		} else {
-			comments = commentsValue.(string)
+			data.Comments = " "
 		}
-		data.Comments = comments
+	}
+	if d.HasChanges("description") {
+		// check if description is set
+		if descriptionValue, ok := d.GetOk("description"); ok {
+			data.Description = descriptionValue.(string)
+		} else {
+			data.Description = " "
+		}
 	}
 
 	if d.HasChanges("serial") {

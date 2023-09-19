@@ -33,6 +33,22 @@ func init() {
 			desc += fmt.Sprintf(" At least one of %s must be given.", joinStringWithFinalConjunction(atLeastOneOf, ", ", "or"))
 		}
 
+		if s.ExactlyOneOf != nil && len(s.ExactlyOneOf) > 0 {
+			exactlyOneOf := make([]string, len(s.ExactlyOneOf))
+			for i, l := range s.ExactlyOneOf {
+				exactlyOneOf[i] = fmt.Sprintf("`%s`", l)
+			}
+			desc += fmt.Sprintf(" Exactly one of %s must be given.", joinStringWithFinalConjunction(exactlyOneOf, ", ", "or"))
+		}
+
+		if s.RequiredWith != nil && len(s.RequiredWith) > 0 {
+			requires := make([]string, len(s.RequiredWith))
+			for i, c := range s.RequiredWith {
+				requires[i] = fmt.Sprintf("`%s`", c)
+			}
+			desc += fmt.Sprintf(" Required when %s is set.", joinStringWithFinalConjunction(requires, ", ", "and"))
+		}
+
 		if s.ConflictsWith != nil && len(s.ConflictsWith) > 0 {
 			conflicts := make([]string, len(s.ConflictsWith))
 			for i, c := range s.ConflictsWith {
@@ -57,55 +73,71 @@ func init() {
 func Provider() *schema.Provider {
 	provider := &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
-			"netbox_available_ip_address": resourceNetboxAvailableIPAddress(),
-			"netbox_virtual_machine":      resourceNetboxVirtualMachine(),
-			"netbox_cluster_type":         resourceNetboxClusterType(),
-			"netbox_cluster":              resourceNetboxCluster(),
-			"netbox_contact":              resourceNetboxContact(),
-			"netbox_contact_group":        resourceNetboxContactGroup(),
-			"netbox_contact_assignment":   resourceNetboxContactAssignment(),
-			"netbox_contact_role":         resourceNetboxContactRole(),
-			"netbox_device":               resourceNetboxDevice(),
-			"netbox_device_interface":     resourceNetboxDeviceInterface(),
-			"netbox_device_type":          resourceNetboxDeviceType(),
-			"netbox_manufacturer":         resourceNetboxManufacturer(),
-			"netbox_tenant":               resourceNetboxTenant(),
-			"netbox_tenant_group":         resourceNetboxTenantGroup(),
-			"netbox_vrf":                  resourceNetboxVrf(),
-			"netbox_ip_address":           resourceNetboxIPAddress(),
-			"netbox_interface":            resourceNetboxInterface(),
-			"netbox_service":              resourceNetboxService(),
-			"netbox_platform":             resourceNetboxPlatform(),
-			"netbox_prefix":               resourceNetboxPrefix(),
-			"netbox_available_prefix":     resourceNetboxAvailablePrefix(),
-			"netbox_primary_ip":           resourceNetboxPrimaryIP(),
-			"netbox_device_primary_ip":    resourceNetboxDevicePrimaryIP(),
-			"netbox_device_role":          resourceNetboxDeviceRole(),
-			"netbox_tag":                  resourceNetboxTag(),
-			"netbox_cluster_group":        resourceNetboxClusterGroup(),
-			"netbox_site":                 resourceNetboxSite(),
-			"netbox_vlan":                 resourceNetboxVlan(),
-			"netbox_vlan_group":           resourceNetboxVlanGroup(),
-			"netbox_ipam_role":            resourceNetboxIpamRole(),
-			"netbox_ip_range":             resourceNetboxIpRange(),
-			"netbox_region":               resourceNetboxRegion(),
-			"netbox_aggregate":            resourceNetboxAggregate(),
-			"netbox_rir":                  resourceNetboxRir(),
-			"netbox_route_target":         resourceNetboxRouteTarget(),
-			"netbox_circuit":              resourceNetboxCircuit(),
-			"netbox_circuit_type":         resourceNetboxCircuitType(),
-			"netbox_circuit_provider":     resourceNetboxCircuitProvider(),
-			"netbox_circuit_termination":  resourceNetboxCircuitTermination(),
-			"netbox_user":                 resourceNetboxUser(),
-			"netbox_permission":           resourceNetboxPermission(),
-			"netbox_token":                resourceNetboxToken(),
-			"netbox_custom_field":         resourceCustomField(),
-			"netbox_asn":                  resourceNetboxAsn(),
-			"netbox_location":             resourceNetboxLocation(),
-			"netbox_site_group":           resourceNetboxSiteGroup(),
-			"netbox_rack":                 resourceNetboxRack(),
-			"netbox_rack_role":            resourceNetboxRackRole(),
-			"netbox_rack_reservation":     resourceNetboxRackReservation(),
+			"netbox_available_ip_address":       resourceNetboxAvailableIPAddress(),
+			"netbox_virtual_machine":            resourceNetboxVirtualMachine(),
+			"netbox_cluster_type":               resourceNetboxClusterType(),
+			"netbox_cluster":                    resourceNetboxCluster(),
+			"netbox_contact":                    resourceNetboxContact(),
+			"netbox_contact_group":              resourceNetboxContactGroup(),
+			"netbox_contact_assignment":         resourceNetboxContactAssignment(),
+			"netbox_contact_role":               resourceNetboxContactRole(),
+			"netbox_device":                     resourceNetboxDevice(),
+			"netbox_device_interface":           resourceNetboxDeviceInterface(),
+			"netbox_device_type":                resourceNetboxDeviceType(),
+			"netbox_manufacturer":               resourceNetboxManufacturer(),
+			"netbox_tenant":                     resourceNetboxTenant(),
+			"netbox_tenant_group":               resourceNetboxTenantGroup(),
+			"netbox_vrf":                        resourceNetboxVrf(),
+			"netbox_ip_address":                 resourceNetboxIPAddress(),
+			"netbox_interface":                  resourceNetboxInterface(),
+			"netbox_service":                    resourceNetboxService(),
+			"netbox_platform":                   resourceNetboxPlatform(),
+			"netbox_prefix":                     resourceNetboxPrefix(),
+			"netbox_available_prefix":           resourceNetboxAvailablePrefix(),
+			"netbox_primary_ip":                 resourceNetboxPrimaryIP(),
+			"netbox_device_primary_ip":          resourceNetboxDevicePrimaryIP(),
+			"netbox_device_role":                resourceNetboxDeviceRole(),
+			"netbox_tag":                        resourceNetboxTag(),
+			"netbox_cluster_group":              resourceNetboxClusterGroup(),
+			"netbox_site":                       resourceNetboxSite(),
+			"netbox_vlan":                       resourceNetboxVlan(),
+			"netbox_vlan_group":                 resourceNetboxVlanGroup(),
+			"netbox_ipam_role":                  resourceNetboxIpamRole(),
+			"netbox_ip_range":                   resourceNetboxIPRange(),
+			"netbox_region":                     resourceNetboxRegion(),
+			"netbox_aggregate":                  resourceNetboxAggregate(),
+			"netbox_rir":                        resourceNetboxRir(),
+			"netbox_route_target":               resourceNetboxRouteTarget(),
+			"netbox_circuit":                    resourceNetboxCircuit(),
+			"netbox_circuit_type":               resourceNetboxCircuitType(),
+			"netbox_circuit_provider":           resourceNetboxCircuitProvider(),
+			"netbox_circuit_termination":        resourceNetboxCircuitTermination(),
+			"netbox_user":                       resourceNetboxUser(),
+			"netbox_permission":                 resourceNetboxPermission(),
+			"netbox_token":                      resourceNetboxToken(),
+			"netbox_custom_field":               resourceCustomField(),
+			"netbox_asn":                        resourceNetboxAsn(),
+			"netbox_location":                   resourceNetboxLocation(),
+			"netbox_site_group":                 resourceNetboxSiteGroup(),
+			"netbox_rack":                       resourceNetboxRack(),
+			"netbox_rack_role":                  resourceNetboxRackRole(),
+			"netbox_rack_reservation":           resourceNetboxRackReservation(),
+			"netbox_cable":                      resourceNetboxCable(),
+			"netbox_device_console_port":        resourceNetboxDeviceConsolePort(),
+			"netbox_device_console_server_port": resourceNetboxDeviceConsoleServerPort(),
+			"netbox_device_power_port":          resourceNetboxDevicePowerPort(),
+			"netbox_device_power_outlet":        resourceNetboxDevicePowerOutlet(),
+			"netbox_device_front_port":          resourceNetboxDeviceFrontPort(),
+			"netbox_device_rear_port":           resourceNetboxDeviceRearPort(),
+			"netbox_device_module_bay":          resourceNetboxDeviceModuleBay(),
+			"netbox_module":                     resourceNetboxModule(),
+			"netbox_module_type":                resourceNetboxModuleType(),
+			"netbox_power_feed":                 resourceNetboxPowerFeed(),
+			"netbox_power_panel":                resourceNetboxPowerPanel(),
+			"netbox_inventory_item_role":        resourceNetboxInventoryItemRole(),
+			"netbox_inventory_item":             resourceNetboxInventoryItem(),
+			"netbox_webhook":                    resourceNetboxWebhook(),
+			"netbox_custom_field_choice_set":    resourceNetboxCustomFieldChoiceSet(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"netbox_asn":              dataSourceNetboxAsn(),
@@ -120,6 +152,7 @@ func Provider() *schema.Provider {
 			"netbox_tenants":          dataSourceNetboxTenants(),
 			"netbox_tenant_group":     dataSourceNetboxTenantGroup(),
 			"netbox_vrf":              dataSourceNetboxVrf(),
+			"netbox_vrfs":             dataSourceNetboxVrfs(),
 			"netbox_platform":         dataSourceNetboxPlatform(),
 			"netbox_prefix":           dataSourceNetboxPrefix(),
 			"netbox_prefixes":         dataSourceNetboxPrefixes(),
@@ -127,13 +160,14 @@ func Provider() *schema.Provider {
 			"netbox_device_role":      dataSourceNetboxDeviceRole(),
 			"netbox_device_type":      dataSourceNetboxDeviceType(),
 			"netbox_site":             dataSourceNetboxSite(),
+			"netbox_location":         dataSourceNetboxLocation(),
 			"netbox_tag":              dataSourceNetboxTag(),
 			"netbox_virtual_machines": dataSourceNetboxVirtualMachine(),
 			"netbox_interfaces":       dataSourceNetboxInterfaces(),
 			"netbox_ipam_role":        dataSourceNetboxIPAMRole(),
 			"netbox_route_target":     dataSourceNetboxRouteTarget(),
-			"netbox_ip_addresses":     dataSourceNetboxIpAddresses(),
-			"netbox_ip_range":         dataSourceNetboxIpRange(),
+			"netbox_ip_addresses":     dataSourceNetboxIPAddresses(),
+			"netbox_ip_range":         dataSourceNetboxIPRange(),
 			"netbox_region":           dataSourceNetboxRegion(),
 			"netbox_vlan":             dataSourceNetboxVlan(),
 			"netbox_vlans":            dataSourceNetboxVlans(),
@@ -192,12 +226,11 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, data *schema.ResourceData) (interface{}, diag.Diagnostics) {
-
 	var diags diag.Diagnostics
 
 	config := Config{
 		APIToken:                    data.Get("api_token").(string),
-		AllowInsecureHttps:          data.Get("allow_insecure_https").(bool),
+		AllowInsecureHTTPS:          data.Get("allow_insecure_https").(bool),
 		Headers:                     data.Get("headers").(map[string]interface{}),
 		RequestTimeout:              data.Get("request_timeout").(int),
 		StripTrailingSlashesFromURL: data.Get("strip_trailing_slashes_from_url").(bool),
@@ -211,7 +244,7 @@ func providerConfigure(ctx context.Context, data *schema.ResourceData) (interfac
 	stripTrailingSlashesFromURL := data.Get("strip_trailing_slashes_from_url").(bool)
 
 	if stripTrailingSlashesFromURL {
-		var trimmed bool = false
+		trimmed := false
 
 		// This is Go's poor man's while loop
 		for strings.HasSuffix(serverURL, "/") {
@@ -248,10 +281,9 @@ func providerConfigure(ctx context.Context, data *schema.ResourceData) (interfac
 
 		netboxVersion := res.GetPayload().(map[string]interface{})["netbox-version"].(string)
 
-		supportedVersions := []string{"3.3.0", "3.3.1", "3.3.2", "3.3.3", "3.3.4", "3.3.5", "3.3.6", "3.3.7", "3.3.8", "3.3.9", "3.3.10", "3.4.0", "3.4.1", "3.4.2", "3.4.3", "3.4.4", "3.4.5", "3.4.6", "3.4.7", "3.4.8", "3.4.9", "3.4.10"}
+		supportedVersions := []string{"3.6.0", "3.6.1"}
 
 		if !slices.Contains(supportedVersions, netboxVersion) {
-
 			// Currently, there is no way to test these warnings. There is an issue to track this: https://github.com/hashicorp/terraform-plugin-sdk/issues/864
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Warning,

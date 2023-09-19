@@ -71,6 +71,7 @@ resource "netbox_virtual_machine" "test" {
   vcpus = "4"
   status = "planned"
   device_id = netbox_device.test.id
+  local_context_data = jsonencode({"context_string"="context_value"})
 
   tags = [netbox_tag.test.name]
 }
@@ -83,19 +84,18 @@ resource "netbox_interface" "test" {
 resource "netbox_ip_address" "test_v4" {
   ip_address = "1.1.1.1/32"
   status = "active"
-  interface_id = netbox_interface.test.id
+  virtual_machine_interface_id = netbox_interface.test.id
 }
 
 resource "netbox_ip_address" "test_v6" {
   ip_address = "2000::1/128"
   status = "active"
-  interface_id = netbox_interface.test.id
+  virtual_machine_interface_id = netbox_interface.test.id
 }
 `, testName)
 }
 
 func TestAccNetboxPrimaryIP4_basic(t *testing.T) {
-
 	testSlug := "pr_ip_basic"
 	testName := testAccGetTestName(testSlug)
 	resource.ParallelTest(t, resource.TestCase{
@@ -125,6 +125,7 @@ resource "netbox_primary_ip" "test_v4" {
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "tags.#", "1"),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "tags.0", testName),
 					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "status", "planned"),
+					resource.TestCheckResourceAttr("netbox_virtual_machine.test", "local_context_data", "{\"context_string\":\"context_value\"}"),
 				),
 			},
 		},
@@ -132,7 +133,6 @@ resource "netbox_primary_ip" "test_v4" {
 }
 
 func TestAccNetboxPrimaryIP6_basic(t *testing.T) {
-
 	testSlug := "pr_ip_basic"
 	testName := testAccGetTestName(testSlug)
 	resource.ParallelTest(t, resource.TestCase{

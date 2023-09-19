@@ -1,8 +1,151 @@
+## 3.7.0 (September 14th, 2023)
+
+**BREAKING CHANGES**
+
+* resource/netbox_custom_field: Replace `choices` attribute with `choice_set_id` attribute
+
+ENHANCEMENTS
+
+* provider: Now officially supports NetBox 3.6
+* **New Resource:** `netbox_custom_field_choice_set`
+
+## 3.6.2 (September 14th, 2023)
+
+FEATURES
+
+* **New Data Source:** `netbox_location` ([#467](https://github.com/e-breuninger/terraform-provider-netbox/pull/467) by [@w87x](https://github.com/w87x))
+* data-source/netbox_virtual_machines: Allow searching by tag ([#466](https://github.com/e-breuninger/terraform-provider-netbox/pull/466) by [@twink0r](https://github.com/twink0r))
+* resource/netbox_device: Add `asset_tag` attribute ([#470](https://github.com/e-breuninger/terraform-provider-netbox/pull/470) by [@bebehei](https://github.com/bebehei))
+* resource/netbox_device_interface: Add `speed`, `lag_device_interface_id` and `parent_device_interface_id` attributes ([#469](https://github.com/e-breuninger/terraform-provider-netbox/pull/469) by [@bebehei](https://github.com/bebehei))
+
+BUG FIXES
+
+* resource/netbox_custom_field: Allow correct value `json` instead of `JSON` ([#459](https://github.com/e-breuninger/terraform-provider-netbox/pull/459) by [@menselman](https://github.com/menselman))
+
+## 3.6.1 (August 31th, 2023)
+
+FEATURES
+
+* **New Resource:** `netbox_webhook` ([#438](https://github.com/e-breuninger/terraform-provider-netbox/pull/438) by [@haipersuccor02](https://github.com/haipersuccor02))
+
+## 3.6.0 (August 18th, 2023)
+
+**BREAKING CHANGES**
+Due to a change in NetBox 3.5's behavior regarding ASN and the corresponding required changes in the go library that is used in this provider,
+the `netbox_asn` resource and the `netbox_asns` data source are no longer supported in versions older than 3.5.
+For all other resources and data sources, the provider should still perform fine with older NetBox versions.
+
+ENHANCEMENTS
+
+* provider: Now officially supports NetBox 3.5
+
+## 3.5.5 (August 18th, 2023)
+
+ENHANCEMENTS
+
+* data-source/netbox_cluster: Allow searching by `id` field and include `custom_fields` attribute in output ([#457](https://github.com/e-breuninger/terraform-provider-netbox/pull/457) by [@fred-clement-91](https://github.com/fred-clement-91))
+
+BUG FIXES
+
+* resource/netbox_device_interface: Changing `mac_address` no longer needlessly forces a recreate of the resource ([#454](https://github.com/e-breuninger/terraform-provider-netbox/pull/454) by [@hamzazaman](https://github.com/hamzazaman))
+
+## 3.5.4 (August 7th, 2023)
+
+FEATURES
+
+* **New Resource:** `netbox_cable` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_console_port` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_console_server_port` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_power_port` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_power_outlet` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_front_port` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_rear_port` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_device_module_bay` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_module` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_module_type` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_power_feed` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_power_panel` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_inventory_item_role` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+* **New Resource:** `netbox_inventory_item` ([#450](https://github.com/e-breuninger/terraform-provider-netbox/pull/450) by [@joeyberkovitz](https://github.com/joeyberkovitz))
+
+## 3.5.3 (August 4th, 2023)
+
+ENHANCEMENTS
+
+* resource/netbox_service: Add `custom_fields` attribute ([#448](https://github.com/e-breuninger/terraform-provider-netbox/pull/448) by [@sebastianreloaded](https://github.com/sebastianreloaded))
+* data-source/netbox_site: Allow searching by `id` field
+
+BUG FIXES
+
+* resource/netbox_interface: Allow setting `enabled` to `false`
+* resource/netbox_device_interface: Allow setting `enabled` to `false`
+
+## 3.5.2 (August 3rd, 2023)
+
+FEATURES
+
+* **New Data Source:** `netbox_vrfs` ([#441](https://github.com/e-breuninger/terraform-provider-netbox/pull/441) by [@robvand](https://github.com/robvand))
+
+ENHANCEMENTS
+
+* Added `description` attribute to
+  - data-source/netbox_cluster
+  - data-source/netbox_devices
+  - data-source/netbox_virtual_machines
+  - resource/netbox_cluster
+  - resource/netbox_device
+  - resource/virtual_machine ([#401](https://github.com/e-breuninger/terraform-provider-netbox/pull/401) by [@tagur87](https://github.com/tagur87))
+* data-source/netbox_devices: Return `tags` attribute
+* resource/netbox_interface: Ignore drift when providing lowercase MAC addresses ([#446](https://github.com/e-breuninger/terraform-provider-netbox/pull/446) by [@bebehei](https://github.com/bebehei))
+* resource/netbox_device_interface: Ignore drift when providing lowercase MAC addresses ([#446](https://github.com/e-breuninger/terraform-provider-netbox/pull/446) by [@bebehei](https://github.com/bebehei))
+
+## 3.5.1 (July 24th, 2023)
+
+BUG FIXES
+
+* resource/netbox_ip_address: Use correct attribute when using the `device_interface_id` attribute ([#437](https://github.com/e-breuninger/terraform-provider-netbox/pull/437) by [@switchcorp](https://github.com/switchcorp))
+* resource/netbox_primary_ip: Fix a bug where setting a primary IP unsets the `local_context_data` attribute ([#435](https://github.com/e-breuninger/terraform-provider-netbox/pull/435) by [@tagur87](https://github.com/tagur87))
+
+## 3.5.0 (July 20th, 2023)
+
+**BREAKING CHANGES**
+Historically, this provider primarily handled virtual machines, so when linking a `netbox_ip_address` resource to an interface, the interface was initially assumed to always be a virtual machine interface. In [v3.1.0](https://github.com/e-breuninger/terraform-provider-netbox/commit/76f11292a162d88eb1616d9a5b7d70d986b2db3f), support was added for device interfaces by setting the newly introduced `object_type` attribute, once again defaulting to virtual machine interfaces. The valid values for `object_type` directly reflect the API values of NetBox, which are very unintuitive.
+
+In this version, we make the type of connection between IP addresses and interfaces explicit: We introduce two new attributes: `virtual_machine_interface_id` and `device_interface_id` to the `netbox_ip_address` resource. These fields are easier to use and convey their meaning directly to the user. The `object_type` and `interface_id` method is still supported, but `object_type` no longer has a default value and is now mandatory when `interface_id` is used.
+
+**Migration guide**
+
+In your existing codebase:
+
+* replace `interface_id` with `virtual_machine_interface_id` if `object_type` is currently unset or set to `virtualization.vminterface`
+* replace `interface_id` with `device_interface_id` if `object_type` is currently set to `dcim.interface`
+
+ENHANCEMENTS
+
+* resource/netbox_ip_address: Add `virtual_machine_interface_id` and `device_interface_id` attributes 
+* resource/netbox_ip_address: Add `slaac` to the list of valid statuses
+* resource/netbox_ip_address: Add `nat_inside_address_id` and `nat_outside_addresses` attributes
+
+BUG FIXES
+
+* resource/netbox_permission: Fix perpetual drift when `constraints` is nil ([#432](https://github.com/e-breuninger/terraform-provider-netbox/pull/432) by [@tagur87](https://github.com/tagur87))
+
+## 3.4.1 (July 19th, 2023)
+
+ENHANCEMENTS
+
+* resource/netbox_cluster: Add `comments` attribute ([#429](https://github.com/e-breuninger/terraform-provider-netbox/pull/429) by [@edwin-bruurs](https://github.com/edwin-bruurs))
+* data-source/netbox_prefix: Add `family` attribute ([#431](https://github.com/e-breuninger/terraform-provider-netbox/pull/431) by [@tagur87](https://github.com/tagur87))
+
+BUG FIXES
+
+* resource/netbox_virtual_machine: Fix `local_context_data` attribute ([#430](https://github.com/e-breuninger/terraform-provider-netbox/pull/430) by [@zeddD1abl0](https://github.com/zeddD1abl0))
+
 ## 3.4.0 (July 10th, 2023)
 
 ENHANCEMENTS
 
-* **New Resource:** `netbox_device_primary_ip` [#424](https://github.com/e-breuninger/terraform-provider-netbox/pull/424) by [@Ikke](https://github.com/Ikke)
+* **New Resource:** `netbox_device_primary_ip` ([#424](https://github.com/e-breuninger/terraform-provider-netbox/pull/424) by [@Ikke](https://github.com/Ikke))
 * resource/netbox_virtual_machine: Add `local_context_data` attribute ([#421](https://github.com/e-breuninger/terraform-provider-netbox/pull/421) by [@zeddD1abl0](https://github.com/zeddD1abl0))
 
 BUG FIXES

@@ -82,7 +82,6 @@ resource "netbox_device_type" "test" {
 }
 
 func TestAccNetboxDevice_basic(t *testing.T) {
-
 	testSlug := "device_basic"
 	testName := testAccGetTestName(testSlug)
 	resource.ParallelTest(t, resource.TestCase{
@@ -94,7 +93,9 @@ func TestAccNetboxDevice_basic(t *testing.T) {
 				Config: testAccNetboxDeviceFullDependencies(testName) + fmt.Sprintf(`
 resource "netbox_device" "test" {
   name = "%[1]s"
+  asset_tag = "TAGGEDITAGGEDITAG"
   comments = "thisisacomment"
+  description = "thisisadescription"
   tenant_id = netbox_tenant.test.id
   platform_id = netbox_platform.test.id
   role_id = netbox_device_role.test.id
@@ -105,9 +106,9 @@ resource "netbox_device" "test" {
   location_id = netbox_location.test.id
   status = "staged"
   serial = "ABCDEF"
-	rack_id = netbox_rack.test.id
-	rack_face = "front"
-	rack_position = 10
+  rack_id = netbox_rack.test.id
+  rack_face = "front"
+  rack_position = 10
 }`, testName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("netbox_device.test", "name", testName),
@@ -118,7 +119,9 @@ resource "netbox_device" "test" {
 					resource.TestCheckResourceAttrPair("netbox_device.test", "site_id", "netbox_site.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "cluster_id", "netbox_cluster.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "rack_id", "netbox_rack.test", "id"),
+					resource.TestCheckResourceAttr("netbox_device.test", "asset_tag", "TAGGEDITAGGEDITAG"),
 					resource.TestCheckResourceAttr("netbox_device.test", "comments", "thisisacomment"),
+					resource.TestCheckResourceAttr("netbox_device.test", "description", "thisisadescription"),
 					resource.TestCheckResourceAttr("netbox_device.test", "status", "staged"),
 					resource.TestCheckResourceAttr("netbox_device.test", "serial", "ABCDEF"),
 					resource.TestCheckResourceAttr("netbox_device.test", "tags.#", "1"),
@@ -131,7 +134,9 @@ resource "netbox_device" "test" {
 				Config: testAccNetboxDeviceFullDependencies(testName) + fmt.Sprintf(`
 resource "netbox_device" "test" {
   name = "%[1]s"
+  asset_tag = "TAGGEDITAGGEDITAG_TAGGEDITAGGEDITAGGEDITAG"
   comments = "thisisacomment"
+  description = "thisisadescription"
   tenant_id = netbox_tenant.test.id
   platform_id = netbox_platform.test.id
   role_id = netbox_device_role.test.id
@@ -140,7 +145,7 @@ resource "netbox_device" "test" {
   site_id = netbox_site.test.id
   cluster_id = netbox_cluster.test.id
   location_id = netbox_location.test.id
-	rack_id = netbox_rack.test.id
+  rack_id = netbox_rack.test.id
   status = "staged"
   serial = "ABCDEF"
 }`, testName),
@@ -153,7 +158,9 @@ resource "netbox_device" "test" {
 					resource.TestCheckResourceAttrPair("netbox_device.test", "site_id", "netbox_site.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "cluster_id", "netbox_cluster.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "rack_id", "netbox_rack.test", "id"),
+					resource.TestCheckResourceAttr("netbox_device.test", "asset_tag", "TAGGEDITAGGEDITAG_TAGGEDITAGGEDITAGGEDITAG"),
 					resource.TestCheckResourceAttr("netbox_device.test", "comments", "thisisacomment"),
+					resource.TestCheckResourceAttr("netbox_device.test", "description", "thisisadescription"),
 					resource.TestCheckResourceAttr("netbox_device.test", "status", "staged"),
 					resource.TestCheckResourceAttr("netbox_device.test", "serial", "ABCDEF"),
 					resource.TestCheckResourceAttr("netbox_device.test", "tags.#", "1"),
@@ -166,7 +173,9 @@ resource "netbox_device" "test" {
 				Config: testAccNetboxDeviceFullDependencies(testName) + fmt.Sprintf(`
 resource "netbox_device" "test" {
   name = "%[1]s"
+  asset_tag = "TAGGEDITAGGEDITAG"
   comments = "thisisacomment"
+  description = "thisisadescription"
   tenant_id = netbox_tenant.test.id
   platform_id = netbox_platform.test.id
   role_id = netbox_device_role.test.id
@@ -186,7 +195,9 @@ resource "netbox_device" "test" {
 					resource.TestCheckResourceAttrPair("netbox_device.test", "role_id", "netbox_device_role.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "site_id", "netbox_site.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_device.test", "cluster_id", "netbox_cluster.test", "id"),
+					resource.TestCheckResourceAttr("netbox_device.test", "asset_tag", "TAGGEDITAGGEDITAG"),
 					resource.TestCheckResourceAttr("netbox_device.test", "comments", "thisisacomment"),
+					resource.TestCheckResourceAttr("netbox_device.test", "description", "thisisadescription"),
 					resource.TestCheckResourceAttr("netbox_device.test", "status", "staged"),
 					resource.TestCheckResourceAttr("netbox_device.test", "serial", "ABCDEF"),
 					resource.TestCheckResourceAttr("netbox_device.test", "tags.#", "1"),

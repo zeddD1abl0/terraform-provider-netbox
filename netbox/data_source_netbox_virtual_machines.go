@@ -65,6 +65,10 @@ func dataSourceNetboxVirtualMachine() *schema.Resource {
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
+						"description": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"device_id": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -146,6 +150,7 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 
 	if filter, ok := d.GetOk("filter"); ok {
 		filterParams := filter.(*schema.Set)
+		var tags []string
 		for _, f := range filterParams.List() {
 			k := f.(map[string]interface{})["name"]
 			v := f.(map[string]interface{})["value"]
@@ -168,6 +173,10 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 			case "site":
 				siteString := v.(string)
 				params.Site = &siteString
+			case "tag":
+				tagString := v.(string)
+				tags = append(tags, tagString)
+				params.Tag = tags
 			default:
 				return fmt.Errorf("'%s' is not a supported filter parameter", k)
 			}
@@ -208,6 +217,9 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 		}
 		if v.Comments != "" {
 			mapping["comments"] = v.Comments
+		}
+		if v.Description != "" {
+			mapping["description"] = v.Description
 		}
 		if v.ConfigContext != nil {
 			if configContext, err := json.Marshal(v.ConfigContext); err == nil {
