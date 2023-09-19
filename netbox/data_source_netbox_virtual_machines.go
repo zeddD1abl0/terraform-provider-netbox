@@ -65,6 +65,10 @@ func dataSourceNetboxVirtualMachine() *schema.Resource {
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
+						"device_id": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
 						"disk_size_gb": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -141,28 +145,28 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 	params := virtualization.NewVirtualizationVirtualMachinesListParams()
 
 	if filter, ok := d.GetOk("filter"); ok {
-		var filterParams = filter.(*schema.Set)
+		filterParams := filter.(*schema.Set)
 		for _, f := range filterParams.List() {
 			k := f.(map[string]interface{})["name"]
 			v := f.(map[string]interface{})["value"]
 			switch k {
 			case "cluster_id":
-				var clusterString = v.(string)
+				clusterString := v.(string)
 				params.ClusterID = &clusterString
 			case "cluster_group":
-				var clusterGroupString = v.(string)
+				clusterGroupString := v.(string)
 				params.ClusterGroup = &clusterGroupString
 			case "name":
-				var nameString = v.(string)
+				nameString := v.(string)
 				params.Name = &nameString
 			case "region":
-				var regionString = v.(string)
+				regionString := v.(string)
 				params.Region = &regionString
 			case "role":
-				var roleString = v.(string)
+				roleString := v.(string)
 				params.Role = &roleString
 			case "site":
-				var siteString = v.(string)
+				siteString := v.(string)
 				params.Site = &siteString
 			default:
 				return fmt.Errorf("'%s' is not a supported filter parameter", k)
@@ -198,7 +202,7 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 
 	var s []map[string]interface{}
 	for _, v := range filteredVms {
-		var mapping = make(map[string]interface{})
+		mapping := make(map[string]interface{})
 		if v.Cluster != nil {
 			mapping["cluster_id"] = v.Cluster.ID
 		}
@@ -212,6 +216,9 @@ func dataSourceNetboxVirtualMachineRead(d *schema.ResourceData, m interface{}) e
 		}
 		if v.CustomFields != nil {
 			mapping["custom_fields"] = v.CustomFields
+		}
+		if v.Device != nil {
+			mapping["device_id"] = v.Device.ID
 		}
 		if v.Disk != nil {
 			mapping["disk_size_gb"] = *v.Disk
